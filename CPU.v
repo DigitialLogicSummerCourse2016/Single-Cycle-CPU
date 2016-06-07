@@ -75,12 +75,15 @@ module CPU(
 					  (MemToReg==2'b01)? DMData:
 					  (MemToReg==2'b10)? PC_plus_4:PC;
 
-  assign PC_next = (PCSrc==3'b000)? PC_plus_4:
+	assign PC_next = (PCSrc==3'b000)? PC_plus_4:
 									 (PCSrc==3'b001)? ALUOut[0]? {PC[31], ConBA[30:0]}:PC_plus_4 :
 									 (PCSrc==3'b010)? {PC[31],3'b0,JT,2'b0}:
 									 (PCSrc==3'b011)? DataBusA:
 									 (PCSrc==3'b100)? ILLOP:
 									 (PCSrc==3'b101)? XADR:XADR;
+
+	wire [11:0] DIGI;
+	assign digi = ~DIGI;
 
  	ROM ROM1(.addr(PC[30:0]),.data(Instrument));
 
@@ -101,6 +104,6 @@ module CPU(
 	//UART and Peripheral
 	Peripheral Perip1(.reset(reset),.clk(clk),.MemRead(MemRd),.MemWrite(MemWr),
 		.Address(ALUOut[31:0]),.Write_data(DataBusB),.Read_data(DMData2),.led(led),
-		.switch(switch),.digi(digi),.irqout(IRQ),.uart_tx(uart_tx),.uart_rx(uart_rx));
+		.switch(switch),.digi(DIGI),.irqout(IRQ),.uart_tx(uart_tx),.uart_rx(uart_rx));
 
 endmodule
