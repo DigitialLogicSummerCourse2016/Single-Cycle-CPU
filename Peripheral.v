@@ -92,7 +92,11 @@ always@(negedge reset or posedge clk) begin
 				default: ;
 			endcase
 		end
-
+        if(~TX_EN)
+            TX_EN <= MemWrite && (Address == 32'h40000018);
+        else if(~tx_status)
+            TX_EN <= 1'b0;
+        
 		if(rx_status)
 			UART_RXD <=RX_DATA;
 
