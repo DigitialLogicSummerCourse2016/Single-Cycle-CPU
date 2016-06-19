@@ -21,6 +21,6 @@ initial fork
 	#5  reset <= 1'b0;
 	#10 reset <= 1'b1;
 	forever #1 clk <= ~clk;
-	forever #1280 uart_rx <= ~uart_rx;
+	forever #10416 uart_rx <= ~uart_rx;
 join
 endmodule
