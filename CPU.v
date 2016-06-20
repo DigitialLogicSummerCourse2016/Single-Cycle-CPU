@@ -82,6 +82,10 @@ module CPU(
 									 (PCSrc==3'b100)? ILLOP:
 									 (PCSrc==3'b101)? XADR:XADR;
 
+	wire MemWr1,MemWr2;
+	assign MemWr1 = (ALUOut[31:28] == 4'b0100) ? 1'b0 : MemWr;
+	assign MemWr2 = (ALUOut[31:28] == 4'b0100) ? MemWr : 1'b0;
+
 	wire [11:0] DIGI;
 	assign digi = ~DIGI;
 
@@ -99,10 +103,10 @@ module CPU(
 		.MemWr(MemWr),.MemRd(MemRd),.EXTOp(EXTOp),.LUOp(LUOp),.Sign(Sign),.PCSupervisor(PCSupervisor));
 
 	DataMemory DM1(.reset(reset), .clk(clk), .Address(ALUOut[31:0]), .Write_data(DataBusB),
-		.Read_data(DMData1), .MemRead(MemRd), .MemWrite(MemWr));
+		.Read_data(DMData1), .MemRead(MemRd), .MemWrite(MemWr1));
 
 	//UART and Peripheral
-	Peripheral Perip1(.reset(reset),.clk(clk),.MemRead(MemRd),.MemWrite(MemWr),
+	Peripheral Perip1(.reset(reset),.clk(clk),.MemRead(MemRd),.MemWrite(MemWr2),
 		.Address(ALUOut[31:0]),.Write_data(DataBusB),.Read_data(DMData2),.led(led),
 		.switch(switch),.digi(DIGI),.irqout(IRQ),.uart_tx(uart_tx),.uart_rx(uart_rx));
 
