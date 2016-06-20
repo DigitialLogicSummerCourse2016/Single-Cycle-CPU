@@ -1,61 +1,55 @@
 module Sender(
+  input smp_clk,
   input tx_en,
   input bot_clk,
   input[7:0] tx_data,
   input reset,
   output reg uart_tx,
   output reg tx_status
-);
-  reg[3:0] cnt=0;
-  reg[3:0] num=0;
+);  reg [7:0] sect_lim,sect_ctr;
 
-  initial uart_tx<=1;
-
-  always@(posedge bot_clk or negedge reset)
+  initial
   begin
-    if(~reset)
+    sect_lim=8'b10100000-1'b1;sect_ctr=8'b0;tx_status=1;
+  end
+  always@(posedge smp_clk or negedge reset)
+  begin
+  if(~reset)
+  begin
+    sect_ctr<=0;tx_status<=1;
+  end
+  else begin
+    if((tx_status)&&(tx_en))
+    begin
+      tx_status<=0;sect_ctr<=8'b00000001;
+    end
+    else if(tx_status==0)
+    begin
+      if(sect_ctr==sect_lim)
       begin
-        cnt<=0;
-        tx_status<=1;
-        uart_tx<=1;
-        cnt<=0;
-        num<=0;
+        tx_status<=1;sect_ctr<=0;
       end
-    else
-      begin
-        if(tx_en) begin tx_status<=0; num<=0; end
-        else if(num==4'd10)  tx_status<=1;
-
-        if(~tx_status)
-        begin
-          if(cnt==4'd15)
-          begin
-            case(num)
-              5'd0:  uart_tx<=0;
-              5'd1:  uart_tx<=tx_data[0];
-              5'd2:  uart_tx<=tx_data[1];
-              5'd3:  uart_tx<=tx_data[2];
-              5'd4:  uart_tx<=tx_data[3];
-              5'd5:  uart_tx<=tx_data[4];
-              5'd6:  uart_tx<=tx_data[5];
-              5'd7:  uart_tx<=tx_data[6];
-              5'd8:  uart_tx<=tx_data[7];
-              5'd9:  uart_tx<=1;
-            endcase
-            num<=num+1'b1;
-            cnt<=0;
-          end
-          else
-            cnt<=cnt+1'b1;
-       	end
-   	  else
- 	      begin
- 	        if(num==4'd10)
- 	          begin
- 	            num<=0;
- 	            uart_tx<=1;
- 	          end
- 	      end
- 	  end
+      else sect_ctr<=sect_ctr+1'b1;
+    end
+  end
+  end
+  always@(posedge smp_clk or negedge reset)
+  begin
+  if(~reset)
+  begin
+    uart_tx<=1;
+  end
+  else begin
+    if (sect_ctr==8'b00000001) uart_tx<=0;
+    if (sect_ctr==8'b00010001) uart_tx<=tx_data[0];
+    if (sect_ctr==8'b00100001) uart_tx<=tx_data[1];
+    if (sect_ctr==8'b00110001) uart_tx<=tx_data[2];
+    if (sect_ctr==8'b01000001) uart_tx<=tx_data[3];
+    if (sect_ctr==8'b01010001) uart_tx<=tx_data[4];
+    if (sect_ctr==8'b01100001) uart_tx<=tx_data[5];
+    if (sect_ctr==8'b01110001) uart_tx<=tx_data[6];
+    if (sect_ctr==8'b10000001) uart_tx<=tx_data[7];
+    if (sect_ctr==8'b10010001) uart_tx<=1;
+  end
   end
 endmodule

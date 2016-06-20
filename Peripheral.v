@@ -51,12 +51,12 @@ always@(*) begin
 end
 
 //UART
-wire bot_clk;
-Generator Gen1(.sys_clk(clk),.reset(reset),.bot_clk(bot_clk));
-Receiver Rec1(.uart_rx(uart_rx),.bot_clk(bot_clk),.reset(reset),.rx_status(rx_status),
+wire bot_clk,smp_clk;
+Generator Gen1(.sys_clk(clk),.reset(reset),.bot_clk(bot_clk),.smp_clk(smp_clk));
+Receiver Rec1(.uart_rx(uart_rx),.smp_clk(smp_clk),.reset(reset),.rx_status(rx_status),
 	.rx_data(RX_DATA));
-Sender Sen1(.tx_en(TX_EN),.bot_clk(bot_clk),.tx_data(UART_TXD),.reset(reset),.uart_tx(uart_tx),
-	.tx_status(tx_status));
+Sender Sen1(.smp_clk(smp_clk),.tx_en(TX_EN),.bot_clk(bot_clk),.tx_data(UART_TXD),.reset(reset),
+	.uart_tx(uart_tx),.tx_status(tx_status));
 
 
 always@(negedge reset or posedge clk) begin

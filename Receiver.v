@@ -1,83 +1,92 @@
 module Receiver(
   input uart_rx,
-  input bot_clk,
+  input smp_clk,
   input reset,
   output reg rx_status,
   output reg[7:0] rx_data
 );
-  reg[4:0] cnt=0;
-  reg[3:0] num=0;
-  reg start=0;
-  reg[7:0] memory;
+  reg copy_RX;
+  reg section;
+  reg [7:0] sect_lim,sect_ctr;
+  reg rcv_smp;
 
-  always@(posedge bot_clk or negedge reset)
+  initial
+  begin
+    sect_lim=8'b10100000-1'b1;sect_ctr=8'b0;section=0;
+  end
+
+  always@(posedge smp_clk or negedge reset)
   begin
     if(~reset)
     begin
-      cnt<=0;
-      rx_data<=0;
-      rx_status<=0;
-      start<=0;
-      memory<=0;
-      num<=0;
+      section<=0;
+      sect_ctr<=8'b0;
     end
     else
       begin
-        if(~(uart_rx||start))
+        if(section==0)
+        begin
+          if((copy_RX==1)&&(uart_rx==0))
           begin
-            start<=1;
-            cnt<=0;
+            section<=1;
+            sect_ctr<=8'b0+1'b1;
           end
-        else if(rx_status)
-          begin
-            num<=0;
-            start<=0;
-          end
-        if(start)
-          begin
-            if(num==0)
-              begin
-                if(cnt==5'd23)
-                  begin
-                    num<=1;
-                    memory[0]<=uart_rx;
-                    cnt<=0;
-                  end
-                else
-                  cnt<=cnt+1'b1;
-              end
-            else if(cnt==5'd15)
-              begin
-                case(num)
-                4'd1:  memory[1]<=uart_rx;
-                4'd2:  memory[2]<=uart_rx;
-                4'd3:  memory[3]<=uart_rx;
-                4'd4:  memory[4]<=uart_rx;
-                4'd5:  memory[5]<=uart_rx;
-                4'd6:  memory[6]<=uart_rx;
-                4'd7:  memory[7]<=uart_rx;
-                endcase
-                num<=num+1'b1;
-                if(num<4'd10)
-                  cnt<=0;
-              end
-            else
-              cnt<=cnt+1'b1;
-          end
-
-
-        if(num==4'd8)
-          begin
-            if(cnt==5'd7)
-              begin
-                rx_data<=memory;
-                rx_status<=1;
-                num<=4'd0;
-                memory<=0;
-              end
-          end
+        end
         else
-          rx_status<=0;
+        begin
+          if(sect_ctr==sect_lim)
+          begin
+            section<=0;sect_ctr<=8'b0;
+          end
+          else
+            sect_ctr<=sect_ctr+1'b1;
+        end
+        copy_RX<=uart_rx;
       end
+  end
+
+  always@(posedge smp_clk or negedge reset)
+  begin
+    if(reset)
+    begin
+    if(rcv_smp) rcv_smp<=0;
+    if( (sect_ctr==8'b00011000)||
+      (sect_ctr==8'b00101000)||
+      (sect_ctr==8'b00111000)||
+      (sect_ctr==8'b01001000)||
+      (sect_ctr==8'b01011000)||
+      (sect_ctr==8'b01101000)||
+      (sect_ctr==8'b01111000)||
+      (sect_ctr==8'b10001000) ) rcv_smp<=1;
+    end
+  end
+  
+  always@(posedge smp_clk or negedge reset)
+  begin
+    if(~reset)
+    begin
+        rx_status<=0;
+    end
+    else begin
+        if(rx_status) rx_status<=0;
+        if(sect_ctr==8'b10011000)
+        if(uart_rx) rx_status<=1;
+    end
+  end
+  
+  always@(posedge rcv_smp or negedge section)
+  begin
+  if(~reset)
+  begin
+    rx_data<=0;
+  end
+  else begin
+    if(~section) rx_data<=8'b0;
+    else
+      begin
+        rx_data[6:0]<=rx_data[7:1];
+        rx_data[7]<=uart_rx;
+      end
+  end
   end
 endmodule
