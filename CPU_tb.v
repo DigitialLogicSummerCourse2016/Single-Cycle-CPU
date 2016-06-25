@@ -8,7 +8,7 @@ module CPU_tb();
 	wire  [11:0] digi;
 	wire  uart_tx;
 
-	CPU CPU1(.reset(reset),.clk(clk),.switch(switch),.uart_rx(uart_rx),.led(led),
+	SC_CPU CPU1(.reset(reset),.clk(clk),.switch(switch),.uart_rx(uart_rx),.led(led),
 		.digi(digi),.uart_tx(uart_tx));
 
 	initial begin
