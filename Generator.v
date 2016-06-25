@@ -9,8 +9,8 @@ reg [12:0]  to_Baud,ctr2;
 
 initial
 begin
-    to_smp=9'b1_0100_0101;    ctr1=9'b0;
-    to_Baud=13'b1_0100_0101_0000;    ctr2=13'b0;
+    to_smp=9'b1_0100_010;    ctr1=9'b0;
+    to_Baud=13'b1_0100_0101_100;    ctr2=13'b0;
     smp_clk=0;
     bot_clk=0;
 end
