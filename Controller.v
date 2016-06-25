@@ -17,23 +17,12 @@ module Controller(
 
 	wire [5:0] Opcode;
 	wire [5:0] Funct;
-	reg [20:0] CtrlSig;
+    reg [20:0] CtrlSig;
+
+	assign {PCSrc, RegDst, RegWr, ALUSrc1, ALUSrc2, ALUFun, Sign, MemWr, MemRd, MemToReg, EXTOp, LUOp} = CtrlSig;
 
 	assign Opcode = Instruction[31:26];
 	assign Funct = Instruction[5:0];
-
-	assign PCSrc = CtrlSig[20:18];
-	assign RegDst = CtrlSig[17:16];
-	assign RegWr = CtrlSig[15];
-	assign ALUSrc1 = CtrlSig[14];
-	assign ALUSrc2 = CtrlSig[13];
-	assign ALUFun = CtrlSig[12:7];
-	assign Sign = CtrlSig[6];
-	assign MemWr = CtrlSig[5];
-	assign MemRd = CtrlSig[4];
-	assign MemToReg = CtrlSig[3:2];
-	assign EXTOp = CtrlSig[1];
-	assign LUOp = CtrlSig[0];
 
 	always @(*) begin
 		if (IRQ & (~PCSupervisor)) begin
@@ -67,6 +56,7 @@ module Controller(
 				6'b001000: CtrlSig <= 21'b000_01_1_0_1_000000_1_0_0_00_1_0; //addi
 				6'b001001: CtrlSig <= 21'b000_01_1_0_1_000000_0_0_0_00_0_0; //addiu
 				6'b001100: CtrlSig <= 21'b000_01_1_0_1_011000_X_0_0_00_0_0; //andi
+				6'b001101: CtrlSig <= 21'b000_01_1_0_1_011110_X_0_0_00_0_0; //ori
 				6'b001010: CtrlSig <= 21'b000_01_1_0_1_110101_1_0_0_00_1_0; //slti
 				6'b001011: CtrlSig <= 21'b000_01_1_0_1_110101_0_0_0_00_0_0; //sltiu
 				6'b000100: CtrlSig <= 21'b001_XX_0_0_0_110011_1_0_0_XX_1_0; //beq
