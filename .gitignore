@@ -1,0 +1,6 @@
+*.mpf
+*.bak
+*.mti
+*.wlf
+*.vstf
+work/*
