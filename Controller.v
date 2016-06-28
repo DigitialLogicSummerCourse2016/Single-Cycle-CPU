@@ -66,7 +66,6 @@ module Controller(
 				6'b000001: CtrlSig <= 21'b001_XX_0_0_0_111011_1_0_0_XX_1_0; //bltz
 				6'b000010: CtrlSig <= 21'b010_XX_0_X_X_XXXXXX_X_0_0_XX_X_X; //j
 				6'b000011: CtrlSig <= 21'b010_10_1_X_X_XXXXXX_X_0_0_10_X_X; //jal
-				6'b001101: CtrlSig <= 21'b000_01_1_0_1_011110_X_0_0_00_0_0; //ori
 				default:   CtrlSig <= 21'b101_11_1_X_X_XXXXXX_X_0_0_10_X_X; //EXPT
 			endcase
 		end
