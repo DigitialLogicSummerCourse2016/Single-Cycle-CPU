@@ -5,16 +5,9 @@ module CPU(
 	input uart_rx,
 	output [7:0] led,
 	output [11:0] digi,
-	output uart_tx,
-	output reg signal
+	output uart_tx
 	);
-    always@(posedge clk or negedge reset)
-    begin
-        if(~reset)
-            signal<=0;
-        else
-            signal<=~signal;
-    end
+
 	parameter ILLOP = 32'h80000004;
 	parameter XADR = 32'h80000008;
 
@@ -53,7 +46,7 @@ module CPU(
 	always@(negedge reset or posedge clk)
 	begin
 		if(~reset)
-			PC <= 32'h00000000;
+			PC <= 32'h80000000;
 		else begin
 			PC <= PC_next;
 		end
