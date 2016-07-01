@@ -17,10 +17,31 @@ module CPU_tb();
 	uart_rx <= 1'b1;
 end
 
-initial fork
+always #1 clk <= ~clk;
+
+initial begin
 	#5  reset <= 1'b0;
 	#10 reset <= 1'b1;
-	forever #1 clk <= ~clk;
-	forever #20833 uart_rx <= ~uart_rx;
-join
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#416660 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+	#20833 uart_rx <= ~uart_rx;
+end
+
 endmodule
